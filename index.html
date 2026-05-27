@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pokedex</title>
+  <title>Pokédex — Batalla</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,68 +12,28 @@
 </head>
 <body>
 
+  <header class="site-header">
+    <div class="header-inner">
+      <svg class="pokeball-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" fill="white" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+        <path d="M1 18 Q1 1 18 1 Q35 1 35 18 Z" fill="#cc0000"/>
+        <rect x="1" y="17" width="34" height="2" fill="#1a1a1a"/>
+        <circle cx="18" cy="18" r="5" fill="white" stroke="#1a1a1a" stroke-width="2"/>
+        <circle cx="18" cy="18" r="2.5" fill="#f0f0f0"/>
+      </svg>
+      <div class="logo">POKÉDEX <span>BATTLE</span></div>
+    </div>
+  </header>
+
   <div class="layout">
-
-    <header class="site-header">
-      <span class="logo">POKEDEX</span>
-      <nav class="nav-tabs">
-        <button class="nav-btn active" data-tab="buscar">Buscar</button>
-        <button class="nav-btn" data-tab="favoritos">Favoritos</button>
-        <button class="nav-btn" data-tab="batalla">Batalla</button>
-      </nav>
-    </header>
-
     <main class="content">
+      <section id="tab-batalla" class="tab-panel">
 
-      <section id="tab-buscar" class="tab-panel active">
-        <div class="search-container">
-          <div class="search-bar">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="pikachu, charizard, ..."
-              autocomplete="off"
-            >
-            <button id="search-btn">Buscar</button>
-          </div>
-          <div id="suggestions-box" class="suggestions-dropdown hidden"></div>
-        </div>
-        
-        <p class="error-msg hidden" id="search-error">No se encontro ese Pokemon.</p>
-        
-        <div class="skeleton hidden" id="search-skeleton">
-          <div class="skeleton-header">
-            <div class="sk-img"></div>
-            <div class="sk-lines">
-              <div class="sk-line wide"></div>
-              <div class="sk-line medium"></div>
-              <div class="sk-line short"></div>
-            </div>
-          </div>
-          <div class="sk-stats">
-            <div class="sk-stat"></div>
-            <div class="sk-stat"></div>
-            <div class="sk-stat"></div>
-            <div class="sk-stat"></div>
-            <div class="sk-stat"></div>
-            <div class="sk-stat"></div>
-          </div>
-        </div>
-        <div class="poke-card hidden" id="main-card"></div>
-      </section>
-
-      <section id="tab-favoritos" class="tab-panel hidden">
-        <p class="empty-state" id="favs-empty">Todavia no guardaste ningun favorito.</p>
-        <div class="favs-grid" id="favs-grid"></div>
-      </section>
-
-      <section id="tab-batalla" class="tab-panel hidden">
         <div class="battle-arena">
-          
           <div class="battle-slot" id="slot-1">
             <div class="search-container">
               <div class="slot-search">
-                <input type="text" class="battle-input" id="b1-input" placeholder="Pokemon 1..." autocomplete="off">
+                <input type="text" class="battle-input" id="b1-input" placeholder="Pokémon 1..." autocomplete="off">
                 <button class="slot-btn" data-slot="1">Cargar</button>
               </div>
               <div id="suggestions-box-0" class="suggestions-dropdown hidden"></div>
@@ -89,7 +49,7 @@
           <div class="battle-slot" id="slot-2">
             <div class="search-container">
               <div class="slot-search">
-                <input type="text" class="battle-input" id="b2-input" placeholder="Pokemon 2..." autocomplete="off">
+                <input type="text" class="battle-input" id="b2-input" placeholder="Pokémon 2..." autocomplete="off">
                 <button class="slot-btn" data-slot="2">Cargar</button>
               </div>
               <div id="suggestions-box-1" class="suggestions-dropdown hidden"></div>
@@ -99,13 +59,24 @@
           </div>
         </div>
 
-        <button class="battle-go-btn hidden" id="battle-go">Analizar batalla</button>
-
+        <button class="battle-go-btn hidden" id="battle-go">⚡ Analizar Batalla</button>
         <div class="battle-result hidden" id="battle-result"></div>
-      </section>
 
+      </section>
     </main>
   </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a class="footer-github" href="https://github.com/Llen123" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.749 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        github.com/Llen123
+      </a>
+      <p class="footer-copy">Pokémon y todos los nombres relacionados son marcas registradas de Nintendo / Creatures Inc. / GAME FREAK inc. Este proyecto es fan-made, sin fines de lucro.</p>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>

@@ -29,7 +29,6 @@ const TYPE_CHART = {
   fairy:    { fire: 0.5, fighting: 2, dragon: 2, dark: 2, steel: 0.5, poison: 0.5 },
 };
 
-let favorites = JSON.parse(localStorage.getItem("poke_favs")) || [];
 let battleData = [null, null];
 let allPokemonNames = [];
 
@@ -55,12 +54,8 @@ async function fetchMoveTypeInfo(moveUrl) {
     const res = await fetch(moveUrl, { cache: "force-cache" });
     if (!res.ok) return null;
     const data = await res.json();
-    
     if (data.damage_class && data.damage_class.name !== "status") {
-      return {
-        name: data.name,
-        type: data.type.name
-      };
+      return { name: data.name, type: data.type.name };
     }
     return null;
   } catch (err) {
@@ -81,130 +76,12 @@ function typePills(types) {
     .join("");
 }
 
-function statBarColor(value) {
-  if (value >= 100) return "#50d098";
-  if (value >= 65)  return "#e8b000";
-  return "#cc3333";
-}
-
-function formatStatName(raw) {
-  const map = {
-    "special-attack":  "sp.atk",
-    "special-defense": "sp.def",
-    "hp":              "hp",
-    "attack":          "atk",
-    "defense":         "def",
-    "speed":           "spe",
-  };
-  return map[raw] || raw;
-}
-
-function buildCardHTML(data) {
-  const types   = data.types.map(t => t.type.name);
-  const imgSrc  = data.sprites.other["official-artwork"]?.front_default || data.sprites.front_default;
-  const isFaved = favorites.some(f => Number(f.id) === Number(data.id));
-  const id      = String(data.id).padStart(3, "0");
-
-  const statsHTML = data.stats.map(s => {
-    const val   = s.base_stat;
-    const name  = formatStatName(s.stat.name);
-    const color = statBarColor(val);
-    const pct   = Math.min((val / 255) * 100, 100).toFixed(1);
-    return `
-      <div class="stat-box">
-        <div class="stat-label">${name}</div>
-        <div class="stat-value">${val}</div>
-        <div class="stat-bar-track">
-          <div class="stat-bar-fill" style="width:${pct}%;background:${color}"></div>
-        </div>
-      </div>`;
-  }).join("");
-
-  return `
-    <div class="card-header">
-      <img class="card-img" src="${imgSrc}" alt="${data.name}">
-      <div class="card-info">
-        <div class="card-name">${data.name}</div>
-        <div class="card-id">#${id}</div>
-        <div class="type-list">${typePills(types)}</div>
-      </div>
-    </div>
-    <div class="stats-grid">${statsHTML}</div>
-    <button
-      class="fav-btn ${isFaved ? "saved" : ""}"
-      data-id="${data.id}"
-      data-name="${data.name}"
-      data-img="${imgSrc}"
-      data-types="${types.join(",")}"
-    >${isFaved ? "Guardado en favoritos" : "Guardar en favoritos"}</button>
-  `;
-}
-
-async function doSearch(query, cardEl, errorEl, skeletonEl) {
-  errorEl.classList.add("hidden");
-  cardEl.classList.add("hidden");
-  if (skeletonEl) skeletonEl.classList.remove("hidden");
-
-  try {
-    const data = await fetchPokemon(query);
-    if (skeletonEl) skeletonEl.classList.add("hidden");
-
-    cardEl.innerHTML = buildCardHTML(data);
-    cardEl.classList.remove("hidden");
-    cardEl.querySelector(".fav-btn").addEventListener("click", handleFavToggle);
-  } catch (err) {
-    if (skeletonEl) skeletonEl.classList.add("hidden");
-    errorEl.classList.remove("hidden");
-  }
-}
-
-function handleFavToggle(e) {
-  const btn    = e.currentTarget;
-  const id     = parseInt(btn.dataset.id);
-  const name   = btn.dataset.name;
-  const img    = btn.dataset.img;
-  const types  = btn.dataset.types.split(",");
-
-  const idx = favorites.findIndex(f => Number(f.id) === id);
-
-  if (idx >= 0) {
-    favorites.splice(idx, 1);
-    btn.textContent = "Guardar en favoritos";
-    btn.classList.remove("saved");
-  } else {
-    favorites.push({ id, name, img, types });
-    btn.textContent = "Guardado en favoritos";
-    btn.classList.add("saved");
-  }
-  localStorage.setItem("poke_favs", JSON.stringify(favorites));
-}
-
-function renderFavorites() {
-  const grid  = document.getElementById("favs-grid");
-  const empty = document.getElementById("favs-empty");
-
-  if (favorites.length === 0) {
-    grid.innerHTML = "";
-    empty.classList.remove("hidden");
-    return;
-  }
-
-  empty.classList.add("hidden");
-  grid.innerHTML = favorites.map(f => `
-    <div class="fav-card" data-name="${f.name}">
-      <img src="${f.img}" alt="${f.name}">
-      <div class="fav-card-name">${f.name}</div>
-      <div class="type-list" style="justify-content:center">${typePills(f.types)}</div>
-    </div>
-  `).join("");
-}
-
 async function loadBattleSlot(slot) {
-  const idx    = slot - 1;
-  const input  = document.getElementById(`b${slot}-input`);
+  const idx     = slot - 1;
+  const input   = document.getElementById(`b${slot}-input`);
   const errorEl = document.getElementById(`b${slot}-error`);
   const preview = document.getElementById(`b${slot}-preview`);
-  const query  = input.value.trim();
+  const query   = input.value.trim();
 
   errorEl.classList.add("hidden");
   preview.classList.add("hidden");
@@ -255,19 +132,15 @@ async function runBattle() {
     const resolvedMoves = await Promise.all(promises);
 
     const movesFound = {};
-    
     resolvedMoves.forEach(move => {
       if (move) {
-        if (!movesFound[move.type]) {
-          movesFound[move.type] = [];
-        }
+        if (!movesFound[move.type]) movesFound[move.type] = [];
         const formattedName = move.name.replace("-", " ");
         if (!movesFound[move.type].includes(formattedName)) {
           movesFound[move.type].push(formattedName);
         }
       }
     });
-
     return movesFound;
   }
 
@@ -280,25 +153,19 @@ async function runBattle() {
   buttonEl.disabled = false;
 
   function getOffensiveAnalysis(baseTypes, movesDetails, defenderTypes) {
-    const nativeAdvantages = [];
+    const nativeAdvantages   = [];
     const coverageAdvantages = [];
-
-    const allOffensiveTypes = new Set([...baseTypes, ...Object.keys(movesDetails)]);
+    const allOffensiveTypes  = new Set([...baseTypes, ...Object.keys(movesDetails)]);
 
     for (const type of allOffensiveTypes) {
       let mult = 1;
-      for (const def of defenderTypes) {
-        mult *= getOffensiveMultiplier(type, def);
-      }
+      for (const def of defenderTypes) mult *= getOffensiveMultiplier(type, def);
 
       if (mult > 1) {
         if (baseTypes.includes(type)) {
           nativeAdvantages.push(type);
-        } else if (movesDetails[type] && movesDetails[type].length > 0) {
-          coverageAdvantages.push({
-            type: type,
-            moves: movesDetails[type]
-          });
+        } else if (movesDetails[type]?.length > 0) {
+          coverageAdvantages.push({ type, moves: movesDetails[type] });
         }
       }
     }
@@ -306,27 +173,20 @@ async function runBattle() {
   }
 
   function getDefensiveAnalysis(defenderTypes, attackerBaseTypes) {
-    const weaknesses = [];
+    const weaknesses  = [];
     const resistances = [];
 
     for (const atk of attackerBaseTypes) {
       let mult = 1;
-      for (const def of defenderTypes) {
-        mult *= getOffensiveMultiplier(atk, def);
-      }
-      
-      if (mult > 1) {
-        weaknesses.push(atk);
-      } else if (mult < 1 && mult > 0) {
-        resistances.push(atk);
-      } else if (mult === 0) {
-        resistances.push(`${atk} (inmune)`);
-      }
-    }
+      for (const def of defenderTypes) mult *= getOffensiveMultiplier(atk, def);
 
+      if (mult > 1)              weaknesses.push(atk);
+      else if (mult < 1 && mult > 0) resistances.push(atk);
+      else if (mult === 0)       resistances.push(`${atk} (inmune)`);
+    }
     return {
-      weaknesses: [...new Set(weaknesses)],
-      resistances: [...new Set(resistances)]
+      weaknesses:  [...new Set(weaknesses)],
+      resistances: [...new Set(resistances)],
     };
   }
 
@@ -401,33 +261,17 @@ async function runBattle() {
   resultEl.classList.remove("hidden");
 }
 
-function switchTab(name) {
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.tab === name);
-  });
-  document.querySelectorAll(".tab-panel").forEach(panel => {
-    panel.classList.toggle("hidden", panel.id !== `tab-${name}`);
-  });
-  if (name === "favoritos") renderFavorites();
-}
-
 function setupAutocomplete(inputId, dropdownId, onSelectCallback) {
-  const input = document.getElementById(inputId);
+  const input    = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
   if (!input || !dropdown) return;
 
   input.addEventListener("input", (e) => {
     const value = e.target.value.toLowerCase().trim();
-    if (value.length < 1) {
-      dropdown.classList.add("hidden");
-      return;
-    }
+    if (value.length < 1) { dropdown.classList.add("hidden"); return; }
 
     const filtered = allPokemonNames.filter(name => name.startsWith(value));
-    if (filtered.length === 0) {
-      dropdown.classList.add("hidden");
-      return;
-    }
+    if (filtered.length === 0) { dropdown.classList.add("hidden"); return; }
 
     dropdown.innerHTML = filtered.slice(0, 6)
       .map(name => `<div class="suggestion-item">${name}</div>`)
@@ -437,10 +281,9 @@ function setupAutocomplete(inputId, dropdownId, onSelectCallback) {
 
   dropdown.addEventListener("click", (e) => {
     if (e.target.classList.contains("suggestion-item")) {
-      const selectedName = e.target.textContent;
-      input.value = selectedName;
+      input.value = e.target.textContent;
       dropdown.classList.add("hidden");
-      onSelectCallback(selectedName);
+      onSelectCallback(e.target.textContent);
     }
   });
 
@@ -452,37 +295,8 @@ function setupAutocomplete(inputId, dropdownId, onSelectCallback) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-  });
-
-  document.getElementById("favs-grid").addEventListener("click", (e) => {
-    const card = e.target.closest(".fav-card");
-    if (!card) return;
-    switchTab("buscar");
-    document.getElementById("search-input").value = card.dataset.name;
-    doSearch(card.dataset.name, document.getElementById("main-card"), document.getElementById("search-error"), document.getElementById("search-skeleton"));
-  });
-
-  setupAutocomplete("search-input", "suggestions-box", () => {
-    document.getElementById("search-btn").click();
-  });
-  setupAutocomplete("b1-input", "suggestions-box-0", () => {
-    loadBattleSlot(1);
-  });
-  setupAutocomplete("b2-input", "suggestions-box-1", () => {
-    loadBattleSlot(2);
-  });
-
-  document.getElementById("search-btn").addEventListener("click", () => {
-    const q = document.getElementById("search-input").value.trim();
-    if (!q) return;
-    doSearch(q, document.getElementById("main-card"), document.getElementById("search-error"), document.getElementById("search-skeleton"));
-  });
-
-  document.getElementById("search-input").addEventListener("keydown", e => {
-    if (e.key === "Enter") document.getElementById("search-btn").click();
-  });
+  setupAutocomplete("b1-input", "suggestions-box-0", () => loadBattleSlot(1));
+  setupAutocomplete("b2-input", "suggestions-box-1", () => loadBattleSlot(2));
 
   document.querySelectorAll(".slot-btn").forEach(btn => {
     btn.addEventListener("click", () => loadBattleSlot(parseInt(btn.dataset.slot)));
