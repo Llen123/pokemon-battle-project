@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokedex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icon.png">
+</head>
+<body>
+
+  <div class="layout">
+
+    <header class="site-header">
+      <span class="logo">POKEDEX</span>
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="buscar">Buscar</button>
+        <button class="nav-btn" data-tab="favoritos">Favoritos</button>
+        <button class="nav-btn" data-tab="batalla">Batalla</button>
+      </nav>
+    </header>
+
+    <main class="content">
+
+      <section id="tab-buscar" class="tab-panel active">
+        <div class="search-container">
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="pikachu, charizard, ..."
+              autocomplete="off"
+            >
+            <button id="search-btn">Buscar</button>
+          </div>
+          <div id="suggestions-box" class="suggestions-dropdown hidden"></div>
+        </div>
+        
+        <p class="error-msg hidden" id="search-error">No se encontro ese Pokemon.</p>
+        
+        <div class="skeleton hidden" id="search-skeleton">
+          <div class="skeleton-header">
+            <div class="sk-img"></div>
+            <div class="sk-lines">
+              <div class="sk-line wide"></div>
+              <div class="sk-line medium"></div>
+              <div class="sk-line short"></div>
+            </div>
+          </div>
+          <div class="sk-stats">
+            <div class="sk-stat"></div>
+            <div class="sk-stat"></div>
+            <div class="sk-stat"></div>
+            <div class="sk-stat"></div>
+            <div class="sk-stat"></div>
+            <div class="sk-stat"></div>
+          </div>
+        </div>
+        <div class="poke-card hidden" id="main-card"></div>
+      </section>
+
+      <section id="tab-favoritos" class="tab-panel hidden">
+        <p class="empty-state" id="favs-empty">Todavia no guardaste ningun favorito.</p>
+        <div class="favs-grid" id="favs-grid"></div>
+      </section>
+
+      <section id="tab-batalla" class="tab-panel hidden">
+        <div class="battle-arena">
+          
+          <div class="battle-slot" id="slot-1">
+            <div class="search-container">
+              <div class="slot-search">
+                <input type="text" class="battle-input" id="b1-input" placeholder="Pokemon 1..." autocomplete="off">
+                <button class="slot-btn" data-slot="1">Cargar</button>
+              </div>
+              <div id="suggestions-box-0" class="suggestions-dropdown hidden"></div>
+            </div>
+            <p class="error-msg hidden" id="b1-error">No encontrado.</p>
+            <div class="battle-preview hidden" id="b1-preview"></div>
+          </div>
+
+          <div class="vs-divider">
+            <span>VS</span>
+          </div>
+
+          <div class="battle-slot" id="slot-2">
+            <div class="search-container">
+              <div class="slot-search">
+                <input type="text" class="battle-input" id="b2-input" placeholder="Pokemon 2..." autocomplete="off">
+                <button class="slot-btn" data-slot="2">Cargar</button>
+              </div>
+              <div id="suggestions-box-1" class="suggestions-dropdown hidden"></div>
+            </div>
+            <p class="error-msg hidden" id="b2-error">No encontrado.</p>
+            <div class="battle-preview hidden" id="b2-preview"></div>
+          </div>
+        </div>
+
+        <button class="battle-go-btn hidden" id="battle-go">Analizar batalla</button>
+
+        <div class="battle-result hidden" id="battle-result"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
