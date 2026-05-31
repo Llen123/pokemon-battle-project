@@ -23,6 +23,40 @@
   --radius-lg: 12px;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --bg-card: #1e1e1e;
+    --bg-card-2: #2a2a2a;
+    --border: #333333;
+    --border-light: #444444;
+    --text: #f0f0f0;
+    --text-muted: #aaaaaa;
+    --text-dim: #666666;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --bg-card: #1e1e1e;
+  --bg-card-2: #2a2a2a;
+  --border: #333333;
+  --border-light: #444444;
+  --text: #f0f0f0;
+  --text-muted: #aaaaaa;
+  --text-dim: #666666;
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f5f0;
+  --bg-card: #ffffff;
+  --bg-card-2: #f0f0eb;
+  --border: #d0d0c8;
+  --border-light: #b8b8b0;
+  --text: #1a1a1a;
+  --text-muted: #555555;
+  --text-dim: #999999;
+}
 html { font-size: 16px; }
 
 body {
@@ -213,9 +247,9 @@ body {
 }
 
 .battle-preview img {
-  width: 144px;
-  height: 144px;
-  image-rendering: pixelated;
+  width: 180px;
+  height: 180px;
+  image-rendering: auto;
   display: block;
   margin: 0 auto;
 }
@@ -284,11 +318,16 @@ body {
 
 .battle-analysis-box {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 1.25rem;
   margin-top: 0.5rem;
+  align-items: start;
 }
 
+.battle-analysis-box .analysis-section {
+  flex: 1;
+  min-width: 0;
+}
 .analysis-section {
   background: var(--bg-card-2);
   border: 1px solid var(--border);
@@ -322,11 +361,12 @@ body {
 }
 
 .analysis-divider {
-  height: 1px;
+  width: 1px;
+  height: auto;
+  align-self: stretch;
   background: var(--border);
-  margin: 0.25rem 0;
+  margin: 0;
 }
-
 /* ---- DEFENSA ---- */
 
 .status-spacing { margin-top: 0.85rem; }
@@ -447,12 +487,97 @@ body {
 
 .hidden { display: none !important; }
 
+.stats-box {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 44px 32px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-value {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+}
+
+.stat-bar-bg {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ---- THEME TOGGLE ---- */
+
+.theme-toggle {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.25);
+}
+/* ---- WIKI LINK ---- */
+
+.pokemon-wiki-link {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--red);
+  transition: color 0.15s;
+}
+
+.pokemon-wiki-link:hover {
+  color: var(--red);
+}
+
+
 /* ---- RESPONSIVE ---- */
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .battle-arena {
     grid-template-columns: 1fr 32px 1fr;
     gap: 6px;
   }
   .vs-divider span { font-size: 7px; }
+  .battle-analysis-box {
+    flex-direction: column;
+  }
+  .analysis-divider {
+    width: auto;
+    height: 1px;
+  }
 }

@@ -76,6 +76,95 @@ function typePills(types) {
     .join("");
 }
 
+function getFullDefensiveWeaknesses(defenderTypes) {
+  const results = {};
+  const allTypes = Object.keys(TYPE_CHART);
+
+  for (const atkType of allTypes) {
+    let mult = 1;
+    for (const defType of defenderTypes) {
+       mult *= getOffensiveMultiplier(atkType, defType);
+    }
+    if (mult > 1) results[atkType] = mult;
+  }
+  return results;
+}
+
+function showWeaknesses(pokemonData) {
+  const container = document.getElementById("p2-weaknesses");
+  if (!container) return;
+
+  const types = pokemonData.types.map(t => t.type.name);
+  const weaknesses = getFullDefensiveWeaknesses(types);
+
+  if (Object.keys(weaknesses).length === 0) {
+    container.innerHTML = `<p class="no-advantage">No tiene debilidades conocidas.</p>`;
+    container.classList.remove("hidden");
+    return;
+  }
+
+  const x4 = Object.entries(weaknesses).filter(([,v]) => v >= 4);
+  const x2 = Object.entries(weaknesses).filter(([,v]) => v === 2);
+
+  let html = `<p class="advantage-text"><strong>Súper efectivo contra ${pokemonData.name.toUpperCase()}:</strong></p>`;
+
+  if (x4.length > 0) {
+    html += `<div class="defense-row">
+      <span class="def-label status-weak">💥 x4:</span>
+      <div class="type-list">${x4.map(([t]) => `<span class="type-pill" style="background:${TYPE_COLORS[t]||'#666'}">${t}</span>`).join("")}</div>
+    </div>`;
+  }
+  if (x2.length > 0) {
+    html += `<div class="defense-row">
+      <span class="def-label status-weak">⚡ x2:</span>
+      <div class="type-list">${x2.map(([t]) => `<span class="type-pill" style="background:${TYPE_COLORS[t]||'#666'}">${t}</span>`).join("")}</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+  container.classList.remove("hidden");
+}
+
+
+function showStats(pokemonData, slot) {
+  const container = document.getElementById(`b${slot}-stats`);
+  if (!container) return;
+
+  const statNames = {
+    "hp": "HP", "attack": "ATK", "defense": "DEF",
+    "special-attack": "Sp.ATK", "special-defense": "Sp.DEF", "speed": "SPD"
+  };
+  const statColors = {
+    "hp": "#4caf50", "attack": "#f44336", "defense": "#2196f3",
+    "special-attack": "#9c27b0", "special-defense": "#00bcd4", "speed": "#ff9800"
+  };
+
+  const MAX_STAT = 255;
+
+  let html = `<div class="stats-box">`;
+  for (const s of pokemonData.stats) {
+    const key   = s.stat.name;
+    const value = s.base_stat;
+    const pct   = Math.round((value / MAX_STAT) * 100);
+    const label = statNames[key] || key;
+    const color = statColors[key] || "#888";
+
+    html += `
+      <div class="stat-row">
+        <span class="stat-label">${label}</span>
+        <span class="stat-value">${value}</span>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" style="width:${pct}%; background:${color};"></div>
+        </div>
+      </div>`;
+  }
+  html += `</div>`;
+
+  container.innerHTML = html;
+  container.classList.remove("hidden");
+}
+
+
 async function loadBattleSlot(slot) {
   const idx     = slot - 1;
   const input   = document.getElementById(`b${slot}-input`);
@@ -94,15 +183,30 @@ async function loadBattleSlot(slot) {
 
     const types  = data.types.map(t => t.type.name);
     const imgSrc = data.sprites.other["official-artwork"]?.front_default || data.sprites.front_default;
-
     preview.innerHTML = `
       <img src="${imgSrc}" alt="${data.name}">
-      <div class="battle-preview-name">${data.name}</div>
+      <div class="battle-preview-name">
+        <a class="pokemon-wiki-link" href="https://www.wikidex.net/wiki/${data.name.charAt(0).toUpperCase() + data.name.slice(1)}" target="_blank" rel="noopener noreferrer">
+          ${data.name}
+        </a>
+      </div>>
       <div class="type-list">${typePills(types)}</div>
     `;
     preview.classList.remove("hidden");
+    showStats(data, slot);
+      if (slot === 2) {
+    showWeaknesses(data);
+  } else {
+    const w = document.getElementById("p2-weaknesses");
+    if (w) w.classList.add("hidden");
+  }
   } catch (err) {
     battleData[idx] = null;
+    document.getElementById(`b${slot}-stats`)?.classList.add("hidden");
+    if (slot === 2) {
+      const w = document.getElementById("p2-weaknesses");
+    if (w) w.classList.add("hidden");
+    }
     errorEl.classList.remove("hidden");
   }
 
@@ -311,4 +415,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("battle-go").addEventListener("click", runBattle);
+  const root        = document.documentElement;
+  const toggleBtn   = document.getElementById("theme-toggle");
+  const saved       = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  // Aplicar tema inicial
+  const initial = saved || (prefersDark ? "dark" : "light");
+  root.setAttribute("data-theme", initial);
+  toggleBtn.textContent = initial === "dark" ? "☀️" : "🌙";
+
+  toggleBtn.addEventListener("click", () => {
+  const current = root.getAttribute("data-theme");
+  const next    = current === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  localStorage.setItem("theme", next);
+  toggleBtn.textContent = next === "dark" ? "☀️" : "🌙";
+  });
 });
